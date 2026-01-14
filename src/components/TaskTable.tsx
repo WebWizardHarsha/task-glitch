@@ -85,7 +85,13 @@ export default function TaskTable({ tasks, onAdd, onUpdate, onDelete }: Props) {
                   <TableCell align="right">
                     <Stack direction="row" spacing={1} justifyContent="flex-end">
                       <Tooltip title="Edit">
-                        <IconButton onClick={() => handleEditClick(t)} size="small">
+                        <IconButton
+  onClick={(e) => {
+    e.stopPropagation();
+    handleEditClick(t);
+  }}
+  size="small"
+>
                           <EditIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
