@@ -18,6 +18,7 @@ interface UseTasksState {
   derivedSorted: DerivedTask[];
   metrics: Metrics;
   lastDeleted: Task | null;
+  undoOpen: boolean;
   addTask: (task: Omit<Task, 'id'> & { id?: string }) => void;
   updateTask: (id: string, patch: Partial<Task>) => void;
   deleteTask: (id: string) => void;
@@ -39,6 +40,7 @@ export function useTasks(): UseTasksState {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastDeleted, setLastDeleted] = useState<Task | null>(null);
+  const [undoOpen, setUndoOpen] = useState(false);
   const fetchedRef = useRef(false);
 
   function normalizeTasks(input: any[]): Task[] {
@@ -146,6 +148,7 @@ export function useTasks(): UseTasksState {
     setTasks(prev => {
       const target = prev.find(t => t.id === id) || null;
       setLastDeleted(target);
+      setUndoOpen(true);
       return prev.filter(t => t.id !== id);
     });
   }, []);
@@ -154,10 +157,12 @@ export function useTasks(): UseTasksState {
     if (!lastDeleted) return;
     setTasks(prev => [...prev, lastDeleted]);
     setLastDeleted(null);
+    setUndoOpen(false);
   }, [lastDeleted]);
 
   const clearUndo = useCallback(() => {
     setLastDeleted(null);
+    setUndoOpen(false);
   }, []);
 
   return {
@@ -167,6 +172,7 @@ export function useTasks(): UseTasksState {
     derivedSorted,
     metrics,
     lastDeleted,
+    undoOpen,
     addTask,
     updateTask,
     deleteTask,
